@@ -1,0 +1,318 @@
+.theme(
+  @background: #042331,
+  @header-bg: #063146,
+  @mb-bg:white,
+  @background-image:url('../img/bg.jpg'))
+{
+  .select-style-box{
+    position: fixed;
+    right: 0;
+    top: 0;
+    z-index: 999;
+}
+  .sidrbar{
+    position: fixed;
+    left: -250px;
+    width: 250px;
+    height: 100%;
+    background-color: @background;
+    transition: all 1s ease;
+    header{
+        font-size: 22px;
+        color: white;
+        text-align: center;
+        line-height: 70px;
+        background-color: @header-bg;
+        user-select: none;//控制用户能否选中文本
+    }
+    ul a{
+        display: block;
+        width: 100%;
+        height: 100%;
+        line-height: 65px;
+        font-size: 20px;
+        color: white;
+        padding-left: 40px;
+        box-sizing: border-box;
+        border-top: 1px solid rgba(255, 255, 255, .1);
+        border-bottom: 1px solid black;
+    }
+    ul li:hover a{
+        padding-left: 50px;
+    }
+    .cancel{
+      position: absolute;
+      top:20px;
+      right: 15px;
+      width: 35px;
+      height: 35px;
+      background: @background;
+      color: #0a5278;
+      box-sizing: border-box;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .cancel:before,.cancel:after{
+      content: "";
+      position: absolute;
+      width: 24px;
+      top: 13px;
+      left: 2px;
+      border: 2px solid;
+      display: block;
+    
+    }
+    .cancel:before{
+      transform: rotate(45deg);
+    }
+    .cancel:after{
+      transform: rotate(-45deg);
+    }
+
+  }
+  .MenuButton{
+  position: absolute;
+  left: 40px;
+  top: 40px;
+  padding: 10px;
+  width: 50px;
+  height: 45px;
+  display: block;
+  background-color: @background;
+  box-sizing: border-box;
+  border-radius: 5px;
+  opacity: 1;
+  transition: all 1s ease;
+  cursor: pointer;
+  }
+  .MenuButton > span, .MenuButton > span:before, .MenuButton > span:after{
+  width: 30px;
+  height: 5px;
+  background-color: @mb-bg;
+  display: inline-block;
+  }
+  .MenuButton > span:before, .MenuButton > span:after{
+  content: '';
+  position: absolute;
+  }
+
+  .MenuButton >  span:before{
+  margin-top: 10px;
+  }
+
+  .MenuButton >  span:after{
+  margin-top: -10px;
+  }
+
+
+  .sidrbar-s{
+  left: 0px;
+  }
+
+  .MenuButton-s{
+  left: 250px;
+  opacity: 0;
+  pointer-events: none;
+  }
+  .bg{
+
+  height: 100vh;
+  transition: all 1s ease;
+  }
+  .bg-s{
+  margin-left: 250px;
+  }
+  .bg-img{
+    background-image: @background-image;
+    background-repeat: no-repeat;//	背景圖片不重覆出現，也就是只出現一次
+    background-position: center;//背景圖片水平位置與垂直位置均置中對齊
+    background-size: cover;
+  }
+  .bg-music{
+    background-color: #191919;
+  }
+  .page {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    text-align: center;
+    justify-content: center; //主軸的對齊方式
+    .center {
+      position: relative;
+      width: 750px;
+      perspective: 1200px; //透視
+      .img-card {
+        position: relative;
+        width: 400px;
+        height: 350px;
+        // overflow: hidden;
+        transform-style: preserve-3d; //決定了元素的子元素是在 3D 空間中展開，還是在 2D 平面中展開
+        transition: transform .5s ease-in;
+        img {
+          position: absolute; //跳脫
+          height: 100%;
+          width: 100%;
+          object-fit: cover; //控制置換元素的內容填入的位置及大小 填滿元素的寬度及高度(維持原比例)，通常會剪掉部分的物件。
+        }
+      }
+      .img-card:nth-child(1){
+        margin-top: 0px;
+      }
+      .img-card img:nth-child(1) {
+        transform: rotateX(-270deg) translateY(-175px); //X翻轉-270度 向Y篇移-175px
+        transform-origin: top left; //物件的起始點
+      }
+      .img-card img:nth-child(2) {
+        transform: translateZ(175px);
+        // opacity: 0;
+      }
+      .img-card img:nth-child(3) {
+        transform: rotateX(-90deg) translateY(175px);
+        transform-origin: bottom center;
+      }
+      .img-card img:nth-child(4) {
+        transform: rotateX(-180deg) translateY(350px) translateZ(175px);
+        transform-origin: bottom center;
+      }
+      .img-card-1 {
+        transform: rotateX(-90deg);
+      }
+      .img-card-2 {
+        transform: rotateX(0deg);
+      }
+      .img-card-3 {
+        transform: rotateX(90deg);
+      }
+      .img-card-4 {
+        transform: rotateX(180deg);
+      }
+      .img-sider{
+        position: absolute;
+        display: block;
+        right: 0;
+        top:-30px;
+        label{
+          height: 100px;
+          width: 100px;
+          display: flex;
+          overflow: hidden;
+          cursor: pointer;
+          margin: 6px 0;
+          border: 1px solid rgba(255, 255, 255, .1);
+          img{
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            filter: grayscale(1);//濾鏡效果 - grayscale灰階,sepia懷舊,saturate飽和,hue-rotate色相旋轉,invert負片,opacity不透明,brightness亮度,contrast對比,blur模糊,drop-shadow下拉陰影
+            opacity: .9;
+          }
+          img:hover,
+          .change-1,.change-2,.change-3,.change-4{
+            filter: grayscale(0);
+            opacity: 1;
+          }
+        }
+  
+      }
+  
+    }
+    
+  }
+  .page-2 {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: flex-start; //主軸的對齊方式
+    flex-direction: column;
+    .header {
+      position: relative;
+      width: 100%;
+      height: 100px;
+      text-align: center;
+      top: 8%;
+      h2 {
+        height: 100%;
+        line-height: 4;
+      }
+    }
+    .canvas-box {
+      position: relative;
+      top: 10%;
+      margin: 0 10%;
+      display: flex;
+      // width: 80%;
+      box-sizing: border-box;
+      #canva {
+        border: 1px solid #ffffff;
+        background-color: #cac2c2e6;
+      }
+      .set-sider {
+        text-align: center;
+        border: 1px solid #57577347;
+        width: 200px;
+        margin-left: 3rem;
+        button,div{
+          margin: 5px;
+        }
+        button{
+          border-radius: 10px;
+          position: relative;
+          width: 100%;
+          transform: rotateY(30deg);
+          padding: 4px 10px;
+        }
+        .uploader{
+            position: relative;
+            display: inline-block;
+            // // background: #D0EEFF;
+            border: 1px solid #99D3F5;
+            overflow: hidden;
+            // color: #1E88C7;
+            text-decoration: none;
+            text-indent: 0;
+            // line-height: 20px;
+            
+          }
+          .uploader input {
+              position: absolute;
+              font-size: 100px;
+              right: 0;
+              top: 0;
+              opacity: 0;
+          }
+          button:hover {
+              // background: #AADFFD;
+              // border-color: #78C3F3;
+              color: #004974;
+              text-decoration: none;
+          }
+        .select-box {
+          select {
+            /*将默认的select选择框样式清除*/
+            appearance: none;
+            -moz-appearance: none;
+            -webkit-appearance: none;
+            /*在选择框的最右侧中间显示小箭头图片*/
+             background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23007CB2%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E'),
+                linear-gradient(to bottom, #ffffff 0%,#e5e5e5 100%);
+            background-repeat: no-repeat, repeat;
+            background-position: right .7em top 50%, 0 0;
+            background-size: .65em auto, 100%;
+  
+            padding-right: 14px;
+            position: relative;
+            width: 100%;
+            border: 1px solid #ffff;
+            border-radius: 10px;
+            padding-left: 30%;
+            transform: rotateY(30deg);
+          }
+          select option{
+            background: #00000038;
+          }
+        }
+      }
+    }
+  }
+}
