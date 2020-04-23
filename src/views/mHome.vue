@@ -1,61 +1,66 @@
 <template>
   <div class="page">
-    <div class="head-box" v-if="headerInfo">
-      <div class="item-1" v-if="information_Data['icon']!== undefined">
-        <img :src="information_Data['icon']['default']['url']" />
-      </div>
-      <div class="item-2" v-if="information_Data['localizations']!== undefined">
-        <p>{{information_Data['localizations']['description']}}</p>
-      </div>
-    </div>
-    <div class="search-box" v-if="headerInfo==false">
-      <input type="text" v-model="searchData.searchKey"/>
-      <button @click="getSearchList">Search</button>
-    </div>
-    <div class="list-body" :class="{'minHigth':searchData.list.length == 0}">
-      <div class="list-item" v-for="(item , key ) in playlist" :key="key" :class="{'outwin':listStatus}" ref="dataList" >
-        <div class="item-title" @click="playMusicList(item)">
-          <span>{{item.title}}</span>
+    <div class="page-body">
+      <div class="head-box" v-if="headerInfo">
+        <div class="item-1" v-if="information_Data['icon']!== undefined">
+          <img :src="information_Data['icon']['default']['url']" />
         </div>
-        <div class="list-item-btn-p" @click="next(key,0)"><</div>
-        <ul class="item-box" ref="listItem" v-if="item.items.length != 0">
-          <li v-for="(items , keys ) in item.items" :key="keys">
-            <div class="item" @click="playMusic(items.contentDetails.videoId)">
-              <img :src="items.snippet.thumbnails.medium.url" />
-              <div class="play"></div>
-            </div>
-            <span>{{items.snippet.title}}</span>
-          </li>
-        </ul>
-        <ul class="not-item-box " v-else>
-          <li   :class="'flexl'+n" v-for=" n in 3" :key="n">
-            <div class="not-item" >
-              <img src="" />
-              <div class="not-play"></div>
-            </div>
-            <span></span>
-          </li>
-        </ul>
-        <div class="list-item-btn-n" @click="next(key,1)">></div>
+        <div class="item-2" v-if="information_Data['localizations']!== undefined">
+          <p>{{information_Data['localizations']['description']}}</p>
+        </div>
       </div>
-      <div class="searchItem" v-if="listStatus">
+      <div class="search-box" v-if="headerInfo==false">
+        <span class="backBtn" @click="backHome" v-if="listStatus"></span>
+        <input type="text" v-model="searchData.searchKey"/>
+        <button @click="getSearchList">Search</button>
+      </div>
+      <div class="list-body" :class="{'minHigth':searchData.list.length == 0}">
 
-        <div calss="search-list" v-for="(items , keys ) in searchData.list" :key="keys">
+        <div class="list-item" v-for="(item , key ) in playlist" :key="key" :class="{'outwin':listStatus}" ref="dataList" >
+          <div class="item-title" @click="playMusicList(item)">
+            <span>{{item.title}}</span>
+          </div>
+          <div class="list-item-btn-p" @click="next(key,0)"><</div>
+          <ul class="item-box" :ref="`listItem-${key}`" v-if="item.items.length != 0">
+            <li v-for="(items , keys ) in item.items" :key="keys" >
+              <div class="item" @click="playMusic(items.contentDetails.videoId)">
+                <img :src="items.snippet.thumbnails.medium.url" />
+                <div class="play"></div>
+              </div>
+              <span>{{items.snippet.title}}</span>
+            </li>
+          </ul>
+          <ul class="not-item-box " v-else>
+            <li   :class="'flexl'+n" v-for=" n in 3" :key="n">
+              <div class="not-item" >
+                <img src="" />
+                <div class="not-play"></div>
+              </div>
+              <span></span>
+            </li>
+          </ul>
+          <div class="list-item-btn-n" @click="next(key,1)">></div>
+        </div>
 
-          <img :src="items.snippet.thumbnails.medium.url"  @click="playMusic(items.id.videoId)"/>
-          <div >
-            <span class="title" style="font-size: 18px;font-family: DFKai-sb;"  @click="playMusic(items.id.videoId)">{{items.snippet.title}}</span>
-            <span>{{items.snippet.publishedAt | getTime}}</span>
-            <span style="font-size: 13px;">{{items.snippet.description}}</span>
+        <div class="searchItem" v-if="listStatus">
+
+          <div calss="search-list" v-for="(items , keys ) in searchData.list" :key="keys">
+
+            <img :src="items.snippet.thumbnails.medium.url"  @click="playMusic(items.id.videoId)"/>
+            <div >
+              <span class="title" style="font-size: 18px;font-family: DFKai-sb;"  @click="playMusic(items.id.videoId)">{{items.snippet.title}}</span>
+              <span>{{items.snippet.publishedAt | getTime}}</span>
+              <span style="font-size: 13px;">{{items.snippet.description}}</span>
+            </div>
+
           </div>
 
         </div>
-
       </div>
-    </div>
 
-    <!-- music player -->
-    <player class="player-box"></player>
+      <!-- music player -->
+      <!-- <player class="player-box"></player> -->
+    </div>
   </div>
 </template>
 <script>
@@ -131,13 +136,20 @@ export default {
   },
   updated() {},
   methods: {
+    backHome(){
+      this.listStatus = false;
+      setTimeout(() => {
+        for(let i in this.$refs["dataList"]){
+          this.$refs["dataList"][i].style.display = '';
+        }
+      }, 500);
+    },
     setoutPlaylist(){
       this.listStatus = true;
       setTimeout(() => {
         for(let i in this.$refs["dataList"]){
           this.$refs["dataList"][i].style.display = 'none';
         }
-        
       }, 1000);
     },
     getSearchList(){
@@ -244,22 +256,24 @@ export default {
       this.$store.commit("addList", item.playlistId);
     },
     next(event, key) {
-      if(this.$refs["listItem"] == undefined){return}
-      let addCount = this.$refs["listItem"][event]["firstElementChild"][
+     
+      if(this.$refs[`listItem-${event}`] == undefined){return}
+      let addCount = this.$refs[`listItem-${event}`][0]["firstElementChild"][
         "clientWidth"
       ];
       if (key == 0) {
         //pro
-        this.$refs["listItem"][event]["scrollLeft"] -= addCount * 2;
+        this.$refs[`listItem-${event}`][0]["scrollLeft"] -= addCount * 2;
       } else {
         //next
-        this.$refs["listItem"][event]["scrollLeft"] += addCount * 2;
+        
+        this.$refs[`listItem-${event}`][0]["scrollLeft"] += addCount * 2;
       }
       this.btnNext(key, event);
     },
     btnNext(status, key) {
       //list-item-btn-p
-      if (this.$refs["listItem"][key]["scrollLeft"] == 0) {
+      if (this.$refs[`listItem-${key}`][0]["scrollLeft"] == 0) {
         this.$refs["dataList"][0]["childNodes"][1]["style"]["display"] = "none";
       } else {
         this.$refs["dataList"][0]["childNodes"][1]["style"]["display"] =
@@ -268,9 +282,9 @@ export default {
       //list-item-btn-n
 
       if (
-        this.$refs["listItem"][key]["scrollLeft"] ==
-        this.$refs["listItem"][key]["scrollWidth"] -
-          this.$refs["listItem"][key]["clientWidth"]
+        this.$refs[`listItem-${key}`][0]["scrollLeft"] ==
+        this.$refs[`listItem-${key}`][0]["scrollWidth"] -
+          this.$refs[`listItem-${key}`][0]["clientWidth"]
       ) {
         this.$refs["dataList"][0]["childNodes"][3]["style"]["display"] = "none";
       } else {
@@ -284,13 +298,49 @@ export default {
 .page {
   flex-direction: column;
   justify-content: flex-start !important;
-  overflow: auto;
+  overflow-y: scroll;
+
+  .page-body{}
   .search-box {
-    width: 900px;
+    position: relative;
+    width: 1000px;
     line-height: 100px;
     padding: 5px;
     background: #a5a5a514;
     max-width: -webkit-fill-available;
+    .backBtn{
+      display: inline-block;
+      position: absolute;
+      left: 30px;
+    }
+    .backBtn::before{
+      content: "";
+      cursor: pointer;
+      display:inline-block;
+      width: 20px;
+      height: 20px;
+      border-top: 5px solid;
+      border-left: 5px solid;
+      border-color: #ffff;
+      border-radius: 20%;
+      transform: rotateZ(-45deg);
+      border-image: linear-gradient(to right, rgb(154, 154, 154) 0%, rgb(255, 255, 255) 100%);
+      border-image-slice: 1;
+    }
+    .backBtn::after{
+      content: "";
+      cursor: pointer;
+      display:inline-block;      
+      width: 30px;
+      border-top: 5px solid;
+      border-radius: 20%;
+      border-color: #ffff;
+      position: relative;
+      left: -25px;
+      transform: translateY(-10px);
+      border-image: linear-gradient(to right, rgb(154, 154, 154) 0%, rgb(255, 255, 255) 100%);
+      border-image-slice: 1;
+    }
     input{
       background:none;  
       outline:none;  
@@ -314,7 +364,7 @@ export default {
 
   }
   .head-box {
-    width: 900px;
+    width: 1000px;
     padding: 5px;
     background: beige;
     display: grid;
@@ -343,7 +393,8 @@ export default {
   }
 
   .list-body {
-    width: 900px;
+    margin-bottom: 7rem;
+    width: 1000px;
     .searchItem{
       width: 100%;
       div{
@@ -581,11 +632,11 @@ export default {
   }
   .minHigth{
     min-height: min-content;
-    max-width: 80%;
+    // max-width: 80%;
   }
-  .player-box {
-    position: sticky;
-    bottom: 0;
-  }
+  // .player-box {
+  //   position: sticky;
+  //   bottom: 0;
+  // }
 }
 </style>

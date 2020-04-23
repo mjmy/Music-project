@@ -39,7 +39,7 @@ Vue.mixin(apiCall)
 }).$mount('#app')
 
 router.beforeEach((to, from, next) => {
-
+  
   next();
 });
 

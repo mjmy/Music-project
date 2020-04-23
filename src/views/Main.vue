@@ -53,16 +53,18 @@
     <div class="bg" :class="{'bg-img':BGstyle == 0,'bg-music':BGstyle == 1,'bg-s':this.siderbar}">
       <router-view>
       </router-view>
-      
     </div>
-    
+     <!-- music player -->
+    <div class="player">
+        <player class="player-box"></player>
+      </div>
 
     
   </div>
 </template>
 
 <script>
-
+import player from "../components/player.vue";
 export default {
   // name: "Main",
   data() {
@@ -71,7 +73,9 @@ export default {
       style_status:0
     };
   },
-  
+  components: {
+    player
+  },
   beforeRouteUpdate (to, from, next) {
     this.siderbar = false;
     next();
@@ -231,4 +235,12 @@ export default {
 // .bg-s{
 //   margin-left: 250px;
 // }
+.bg-music{
+  overflow: hidden;
+}
+.player{
+    position: absolute;
+    bottom: 0;
+    width: calc(100% - 18px);
+}
 </style>

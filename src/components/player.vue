@@ -325,9 +325,9 @@ export default {
             }
             .b2::after{
               content: "";
-              top: 30%;
+              top: 23%;
               left: 60%;
-              transform: translateY(40px);
+              // transform: translateY(40px);
               opacity: 0;
             }
             .b2::before{
