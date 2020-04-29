@@ -1,6 +1,6 @@
 <template>
     <div class="play-box" v-if="videoId!='' || playerVars.list != ''">
-        <youtube class="youtub"  width="200" height="100" :video-id="videoId" :player-vars="playerVars" @playing="playing" @ready="onReady" @ended="onEnded"  ref="youtube"></youtube>
+        <youtube class="youtub" style="pointer-events:none" width="200" height="100" :video-id="videoId" :player-vars="playerVars" @playing="playing" @ready="onReady" @ended="onEnded"  ref="youtube"></youtube>
         <div class="info">
           <span  v-if="info.data.length != 0"><em ref="marquee">{{info.data.title}}</em></span>
           <div >{{info.currentTime }} / {{info.totalTime}}</div>
@@ -23,8 +23,18 @@
             <span class="vol">
               <input class="volume" type="range" min="0" max="100" step="1" v-model="volume" >
             </span>
-           
           </div>
+          
+        </div>
+        <div class="list-box" >
+            <h2 @click="playListStatus=!playListStatus">清單</h2>
+            <div v-if="playListStatus">
+              <ul>
+                <li v-for="(name,key) in playListItem" :key="key" :class="{ 'playing':playIndex == key}" @click="nextVideo(key)">
+                  <span>{{name}}</span>
+                </li>
+              </ul>
+            </div>
         </div>
     </div>
 </template>
@@ -47,11 +57,15 @@ export default {
       },
       info:{
         data:[],
+        set:{},
         currentTime: "00 : 00",
         totalTime :"00 : 00"
       },
       controlStatus:false, //0 :onPaused 1:onPlay
       volume:100,
+      playList:[],
+      playIndex:-1,
+      playListStatus:false,
       marquee:{}
     }
   },
@@ -97,11 +111,16 @@ export default {
         if(this.$store.state.playList != ''){
           return [1,this.$store.state.playList];
         }
-        
       },
       player() {
         return this.$refs.youtube.player;
       },
+      playListItem(){
+        return this.$store.state.playListItem;
+      },
+      favoriteList(){
+        return this.$store.state.favoriteList;
+      }
 
   },
   mounted(){
@@ -113,12 +132,18 @@ export default {
   forceUpdate(){
     
   },
+  beforeDestroy(){
+    clearInterval(this.info.set);
+    clearInterval(this.marquee)
+  },
   methods: {
 
     onReady(event){
       let infoId =  this.videoId;
       this.controlStatus = true;
       this.player.playVideo()
+      this.getplayList();
+
     },
     onEnded(event){
       this.controlStatus = false;
@@ -127,19 +152,27 @@ export default {
       if(this.controlStatus){
         this.controlStatus = false;
         this.player.pauseVideo();
+        clearInterval(this.info.set)
       }else{
         this.controlStatus = true;
         this.player.playVideo();
       }
     },
-    nextVideo(){
-      this.player.nextVideo()
+    nextVideo(index= null){
+      if(index != null){
+        this.player.playVideoAt(index)//指定播放
+      }else{
+        this.player.nextVideo()
+      }
+      
     },
     previousVideo(){
       this.player.previousVideo()
     },
     playing(even) {
+
       this.info.data = even.playerInfo.videoData;
+      this.playingIndex();
       // this.$set(this.info,"currentTime",'00 : 00')
       //playing time
       this.player.getDuration().then((val)=>{
@@ -150,7 +183,10 @@ export default {
         s = s<10 ? `0${s}` : s;
        this.info.totalTime = `${m} : ${s}`;
       })
-      setInterval(() => {
+      this.info.set = setInterval(() => {
+        if(this.playList.length == 0){
+           clearInterval(this.info.set)
+        }
         this.$refs.youtube.player.getCurrentTime().then((val)=>{
           let m = parseInt(val/60).toString();
           let s = parseInt(val%60).toString()
@@ -164,7 +200,6 @@ export default {
       //play soung name marquee
       setTimeout(()=>{this.setMarquee();},1000)
       
-
     },
     setMarquee(){
       clearInterval(this.marquee)
@@ -185,6 +220,20 @@ export default {
         
       })
       
+    },
+    playingIndex(){
+      //第幾首
+      this.player.getPlaylistIndex().then(index=>{
+        this.playIndex =  index;
+         console.log(index)
+         if(index == -1 && this.playerVars.list == ''){
+           this.playIndex = 0;
+         }
+      })
+        
+    },
+    getplayList(){
+      this.playList = this.playListItem;
     }
   }
 }
@@ -199,7 +248,7 @@ export default {
     background: #40484c;
     z-index: 50;
     background: linear-gradient(0deg, #40484c, #191919, #40484c);
-    .youtub{    pointer-events: none;}
+    .youtub{  pointer-events: none;}
     .info{
       width: 500px;
       color: #fff;
@@ -397,6 +446,62 @@ export default {
         .vol{  opacity: 1;}
        
       }
+
+    }
+    .list-box{
+        position: relative;
+        left: 150px;
+        top: 20px;
+        height: 2rem;
+        font-size: 11px;
+        padding: 5px;
+        display: flex;
+        align-items: center;
+        border: 1px solid #667e84;
+        box-shadow: 8px 4px 20px 0px;
+        background: linear-gradient(-10deg, #4985a085, #04233175);
+        border-radius: 20%;
+        h2{
+          color:#ffff;
+        }
+        div{
+          position: absolute;
+          bottom: 60px;
+          right: -80px;
+          height: 500px;
+          width: 500px;
+          background: linear-gradient(90deg, #185775, #407b98, #2e779c);
+          color: #fff;
+          ul{
+            height: inherit;
+            overflow-x: hidden;
+            li{
+              line-height: 25px;
+              white-space: pre-line;
+              padding: 15px 5px;
+              border-bottom: 1px solid;
+              border-color: #a5a5a575;
+            }
+            .playing{
+              background: linear-gradient(#6c7980 0%,#191313a3 57%, #646d71 100%);
+            }
+          }
+           /*-------滾動條整體樣式----*/
+          ul::-webkit-scrollbar-track {
+            display: none;
+          }
+          /*滾動條裡面小方塊樣式*/
+          ul::-webkit-scrollbar {
+            width: 0px;
+            height: 0px;
+            // background-color: #f5f5f500;
+          }
+          /*滾動條裡面軌道樣式*/
+          ul::-webkit-scrollbar-thumb {
+            display: none;
+          }
+        }
+
     }
 }
 </style>

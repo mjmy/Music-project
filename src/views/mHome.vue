@@ -23,9 +23,13 @@
           <div class="list-item-btn-p" @click="next(key,0)"><</div>
           <ul class="item-box" :ref="`listItem-${key}`" v-if="item.items.length != 0">
             <li v-for="(items , keys ) in item.items" :key="keys" >
-              <div class="item" @click="playMusic(items.contentDetails.videoId)">
+              <div class="item" >
                 <img :src="items.snippet.thumbnails.medium.url" />
-                <div class="play"></div>
+                <div class="play" @click="playMusic(items.contentDetails.videoId,items.snippet.title)">
+                </div>
+                <div class="favorite">
+                  <span @click="addPlayList(items.contentDetails.videoId,items.snippet.title)"><i>+</i><a class="tooltip">加入播放清單</a></span>
+                </div>
               </div>
               <span>{{items.snippet.title}}</span>
             </li>
@@ -46,9 +50,9 @@
 
           <div calss="search-list" v-for="(items , keys ) in searchData.list" :key="keys">
 
-            <img :src="items.snippet.thumbnails.medium.url"  @click="playMusic(items.id.videoId)"/>
+            <img :src="items.snippet.thumbnails.medium.url"  @click="playMusic(items.id.videoId,items.snippet.title)"/>
             <div >
-              <span class="title" style="font-size: 18px;font-family: DFKai-sb;"  @click="playMusic(items.id.videoId)">{{items.snippet.title}}</span>
+              <span class="title" style="font-size: 18px;font-family: DFKai-sb;"  @click="playMusic(items.id.videoId,items.snippet.title)">{{items.snippet.title}}</span>
               <span>{{items.snippet.publishedAt | getTime}}</span>
               <span style="font-size: 13px;">{{items.snippet.description}}</span>
             </div>
@@ -249,11 +253,12 @@ export default {
         );
       }
     },
-    playMusic(item) {
-      this.$store.commit("addPlay", item);
+    playMusic(item,title='') {
+      console.log(item)
+      this.$store.commit("addPlay", [item,title]);
     },
     playMusicList(item) {
-      this.$store.commit("addList", item.playlistId);
+      this.$store.commit("addList", item);
     },
     next(event, key) {
      
@@ -290,6 +295,9 @@ export default {
       } else {
         this.$refs["dataList"][0]["childNodes"][3]["style"]["display"] = "";
       }
+    },
+    addPlayList(id,title){
+      this.$store.commit('addMuicToList',{title:title,id:id});
     }
   }
 };
@@ -455,8 +463,9 @@ export default {
             opacity: 0;
             // display: none;
             transition: all 0.5s ease;
+
           }
-          .item:hover .play {
+          .item:hover .play ,.item:hover .favorite{
             opacity: 0.8;
             cursor: pointer;
           }
@@ -488,7 +497,42 @@ export default {
             border-left: 25px solid aliceblue;
             display: inline-block;
           }
-            
+          .favorite{
+            opacity: 0;
+            transition: all 0.5s ease;
+            span{
+              position: absolute;
+              top: 45%;
+              right: 25%;
+              width: 30px;
+              height: 30px;
+              text-align: center;
+              border: 1px solid #ffff;
+              border-radius: 15%;
+              i{
+                line-height: 30px;
+              }
+            }
+          }
+          .tooltip{
+            visibility: hidden;
+            width: 100px;
+            background-color: black;
+            color: #fff;
+            text-align: center;
+            padding: 5px 0;
+            font-size: 1px;
+            border-radius: 6px;
+
+            position: absolute;
+            display: inline-block;
+            bottom: -35px;
+            left: 0;
+            z-index: 1;
+          }
+          .favorite span:hover .tooltip{
+            visibility: visible;
+          }
         }
       }
       .list-item-btn-p {

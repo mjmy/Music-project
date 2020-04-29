@@ -9,9 +9,11 @@ export default [
           path:"home",
           name:"home",
           component: () => import ('../views/mHome.vue'),
-          children:[
-            
-          ]
+        },
+        {
+          path:"list",
+          name:"list",
+          component: () => import ('../components/music/FavoriteList.vue'),
         },
       ]
     },

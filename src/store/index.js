@@ -15,6 +15,8 @@ export default new Vuex.Store({
     },
     voideID:"",
     playList:"",
+    playListItem:[],
+    favoriteList:[],
     route:{
       testRoute,musicRoute
     }
@@ -34,14 +36,22 @@ export default new Vuex.Store({
       router.addRoutes(newRouter)
     },
     addPlay:(state,data)=>{
-      // console.log(state,data)
       // state.playList = '';
-      state.voideID = data;
+      state.playListItem = [];
+      state.playListItem.push(data[1]);
+      state.voideID = data[0];
     },
     addList:(state,data)=>{
-      console.log(data)
+
       state.voideID = '';
-      state.playList = data;
+      state.playListItem = [];
+      for(let i in data.items){
+        state.playListItem.push(data.items[i]['snippet']['title']);
+      }
+      state.playList = data.playlistId;
+    },
+    addMuicToList:(state,data)=>{
+      state.favoriteList.push({title:data.title,id:data.id})  
     }
   },
   actions: {
@@ -51,6 +61,7 @@ export default new Vuex.Store({
   getters:{
     getVoideID: function (state) {
       return state.voideID
-    }
+    },
+
   }
 })
